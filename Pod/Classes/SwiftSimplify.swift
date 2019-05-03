@@ -37,12 +37,19 @@ func equalsPoints<T>(_ pointA: T, pointB: T) -> Bool {
 		return (pointA.x == pointB.x && pointA.y == pointB.y)
 	} else if let pointA = pointA as? CLLocationCoordinate2D, let pointB = pointB as? CLLocationCoordinate2D {
 		return ( pointA.latitude == pointB.latitude && pointA.longitude == pointB.longitude )
+    } else if let pointA = pointA as? CLLocation, let pointB = pointB as? CLLocation {
+        return ( pointA.coordinate.latitude == pointB.coordinate.latitude && pointA.coordinate.longitude == pointB.coordinate.longitude )
 	}
 	return false
 }
 
-open class SwiftSimplify {
+open class SwiftSimplify: NSObject {
 
+    @objc public class func simplify(locations: [CLLocation], tolerance: Float, highQuality: Bool = false) -> [CLLocation]
+    {
+        return simplify(locations, tolerance: tolerance, highQuality: highQuality)
+    }
+    
 	/**
 	Returns an array of simplified points
 	
@@ -130,6 +137,10 @@ open class SwiftSimplify {
 			point = CGPoint( x: CGFloat(p.latitude), y: CGFloat(p.longitude) )
 			point1 = CGPoint( x: CGFloat(p1.latitude), y: CGFloat(p1.longitude) )
 			point2 = CGPoint( x: CGFloat(p2.latitude), y: CGFloat(p2.longitude) )
+        } else if let p = p as? CLLocation, let p1 = p1 as? CLLocation, let p2 = p2 as? CLLocation {
+            point = CGPoint( x: CGFloat(p.coordinate.latitude), y: CGFloat(p.coordinate.longitude) )
+            point1 = CGPoint( x: CGFloat(p1.coordinate.latitude), y: CGFloat(p1.coordinate.longitude) )
+            point2 = CGPoint( x: CGFloat(p2.coordinate.latitude), y: CGFloat(p2.coordinate.longitude) )
 		}
 		var x = point1.x
 		var y = point1.y
@@ -163,6 +174,10 @@ open class SwiftSimplify {
 			let dx = pointA.latitude - pointB.latitude
 			let dy = pointA.longitude - pointB.longitude
 			return Float ( (dx * dx) + (dy * dy) )
+        } else if let pointA = pointA as? CLLocation, let pointB = pointB as? CLLocation {
+            let dx = pointA.coordinate.latitude - pointB.coordinate.latitude
+            let dy = pointA.coordinate.longitude - pointB.coordinate.longitude
+            return Float ( (dx * dx) + (dy * dy) )
 		} else {
 			return 0.0
 		}
